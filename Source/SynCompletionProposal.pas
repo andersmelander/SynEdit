@@ -1502,36 +1502,40 @@ end;
 function TSynBaseCompletionProposalForm.CanResize(var NewWidth, NewHeight: Integer): Boolean;
 var
   NewLinesInWindow: Integer;
+  BorderHeight: Integer;
   BorderWidth: Integer;
-  tmpHeight : Integer;
 begin
   Result := True;
-  case FDisplayKind of
-  ctCode:
-    begin
-      BorderWidth := 2 * GetSystemMetrics(SM_CYSIZEFRAME);
 
-      if FEffectiveItemHeight <> 0 then
-      begin
-        tmpHeight := NewHeight - BorderWidth;
-        NewLinesInWindow := (tmpHeight - FHeightBuffer) div FEffectiveItemHeight;
+  if (FDisplayKind <> ctCode) then
+    exit;
 
-        if NewLinesInWindow < 1 then
-          NewLinesInWindow := 1;
-      end
-      else
-        NewLinesInWindow := 0;
-
-      FLinesInWindow := NewLinesInWindow;
-
-      NewHeight := FEffectiveItemHeight * FLinesInWindow + FHeightBuffer + BorderWidth;
-
-      if (NewWidth-BorderWidth) < FScrollbar.Width then
-        NewWidth := FScrollbar.Width + BorderWidth;
-    end;
-  ctHint:;
-  ctParams:;
+  if (FResizeable) then
+  begin
+    BorderHeight := 2 * (GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER));
+    BorderWidth := 2 * (GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER));
+  end else
+  begin
+    BorderHeight := 2 * GetSystemMetrics(SM_CYFIXEDFRAME);
+    BorderWidth := 2 * GetSystemMetrics(SM_CXFIXEDFRAME);
   end;
+
+  if FEffectiveItemHeight <> 0 then
+  begin
+    NewLinesInWindow := (NewHeight - BorderHeight - FHeightBuffer) div FEffectiveItemHeight;
+
+    if NewLinesInWindow < 1 then
+      NewLinesInWindow := 1;
+  end
+  else
+    NewLinesInWindow := 0;
+
+  FLinesInWindow := NewLinesInWindow;
+
+  NewHeight := FEffectiveItemHeight * FLinesInWindow + FHeightBuffer + BorderHeight;
+
+  if (NewWidth - BorderWidth) < FScrollbar.Width then
+    NewWidth := FScrollbar.Width + BorderWidth;
 end;
 {$ENDIF}
 
