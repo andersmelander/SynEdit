@@ -2299,51 +2299,57 @@ procedure TSynBaseCompletionProposal.ExecuteEx(s: UnicodeString; x, y: Integer; 
     tmpY := y;
     tmpWidth := 0;
     tmpHeight := 0;
+
     case Kind of
-    ctCode:
-      begin
-        BorderWidth := 2 * GetSystemMetrics(SM_CYSIZEFRAME);
-
-        tmpWidth := FWidth;
-        tmpHeight := Form.FHeightBuffer + Form.FEffectiveItemHeight * FNbLinesInWindow + BorderWidth;
-      end;
-    ctHint:
-      begin
-        BorderWidth := 2;
-        tmpHeight := Form.FEffectiveItemHeight * ItemList.Count + BorderWidth
-          + 2 * Form.Margin;
-
-        Form.Canvas.Font.Assign(Font);
-        for i := 0 to ItemList.Count -1 do
+      ctCode:
         begin
-          tmpStr := ItemList[i];
-          NewWidth := FormattedTextWidth(Form.Canvas, tmpStr, nil, FForm.Images);
-          if NewWidth > tmpWidth then
-            tmpWidth := NewWidth;
+          if (Resizeable) then
+            BorderWidth := 2 * (GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER))
+          else
+            BorderWidth := 2 * GetSystemMetrics(SM_CXFIXEDFRAME);
+
+          tmpWidth := FWidth;
+          tmpHeight := Form.FHeightBuffer + Form.FEffectiveItemHeight * FNbLinesInWindow + BorderWidth;
         end;
 
-        Inc(tmpWidth, 2 * FForm.Margin +BorderWidth);
-      end;
-    ctParams:
-      begin
-        BorderWidth := 2;
-        tmpHeight := Form.FEffectiveItemHeight * ItemList.Count + BorderWidth
-          + 2 * Form.Margin;
-
-        Form.Canvas.Font.Assign(Font);
-        for i := 0 to ItemList.Count -1 do
+      ctHint:
         begin
-          NewWidth := GetParamWidth(StripFormatCommands(ItemList[i]));
+          BorderWidth := 2;
+          tmpHeight := Form.FEffectiveItemHeight * ItemList.Count + BorderWidth
+            + 2 * Form.Margin;
 
-          if Assigned(Form.OnMeasureItem) then
-            Form.OnMeasureItem(Self, i, Form.Canvas, NewWidth);
+          Form.Canvas.Font.Assign(Font);
+          for i := 0 to ItemList.Count -1 do
+          begin
+            tmpStr := ItemList[i];
+            NewWidth := FormattedTextWidth(Form.Canvas, tmpStr, nil, FForm.Images);
+            if NewWidth > tmpWidth then
+              tmpWidth := NewWidth;
+          end;
 
-          if NewWidth > tmpWidth then
-            tmpWidth := NewWidth;
+          Inc(tmpWidth, 2 * FForm.Margin +BorderWidth);
         end;
 
-        Inc(tmpWidth, 2 * FForm.Margin +BorderWidth);
-      end;
+      ctParams:
+        begin
+          BorderWidth := 2;
+          tmpHeight := Form.FEffectiveItemHeight * ItemList.Count + BorderWidth
+            + 2 * Form.Margin;
+
+          Form.Canvas.Font.Assign(Font);
+          for i := 0 to ItemList.Count -1 do
+          begin
+            NewWidth := GetParamWidth(StripFormatCommands(ItemList[i]));
+
+            if Assigned(Form.OnMeasureItem) then
+              Form.OnMeasureItem(Self, i, Form.Canvas, NewWidth);
+
+            if NewWidth > tmpWidth then
+              tmpWidth := NewWidth;
+          end;
+
+          Inc(tmpWidth, 2 * FForm.Margin +BorderWidth);
+        end;
     end;
 
 
