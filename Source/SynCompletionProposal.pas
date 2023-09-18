@@ -1280,17 +1280,14 @@ begin
   begin
     Style := WS_POPUP;
     ExStyle := WS_EX_TOOLWINDOW;
-
-    {$IFDEF SYN_COMPILER_3_UP}
-    if ((Win32Platform and VER_PLATFORM_WIN32_NT) <> 0)
-      and (Win32MajorVersion > 4)
-      and (Win32MinorVersion > 0) {Windows XP} then
+    {$IFDEF SYN_COMPILER_7_UP}
+    if CheckWin32Version(5, 1) then {Windows XP}
     {$ELSE}
     VersionInfo.dwOSVersionInfoSize := sizeof(TOSVersionInfo);
-    if GetVersionEx(VersionInfo)
-      and ((VersionInfo.dwPlatformId and VER_PLATFORM_WIN32_NT) <> 0)
-      and (VersionInfo.dwMajorVersion > 4)
-      and (VersionInfo.dwMinorVersion > 0) {Windows XP} then
+    if GetVersionEx(VersionInfo) and
+      ((VersionInfo.dwPlatformId and VER_PLATFORM_WIN32_NT) <> 0) and
+      ((VersionInfo.dwMajorVersion > 5) or
+       (VersionInfo.dwMajorVersion >= 5) and (VersionInfo.dwMinorVersion >= 1)) {Windows XP} then
     {$ENDIF}
       Params.WindowClass.style := Params.WindowClass.style or CS_DROPSHADOW;
 
