@@ -960,8 +960,11 @@ begin
         begin
           if CurrentColumnIndex <= Columns.Count -1 then
           begin
-            Inc(LastColumnStart, CurrentColumn.FColumnWidth);
-            X := LastColumnStart;
+            if (CurrentColumn.ColumnWidth > 0) then
+            begin
+              Inc(LastColumnStart, CurrentColumn.ColumnWidth);
+              X := LastColumnStart;
+            end;
 
             Inc(CurrentColumnIndex);
             if CurrentColumnIndex <= Columns.Count -1 then
