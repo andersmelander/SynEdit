@@ -343,6 +343,10 @@ begin
 {$ENDIF}
 end;
 
+{$ifopt Q+}
+{$define Q_PLUS}
+{$OVERFLOWCHECKS OFF}
+{$endif}
 function TSynDWSSyn.HashKey(Str: PWideChar): Cardinal;
 var
   c: Word;
@@ -353,12 +357,16 @@ begin
     c := Ord(Str^);
     if c in [Ord('A')..Ord('Z')] then
       c := c + (Ord('a') - Ord('A'));
-    Result := Result * 692 + c * 171;
+    Result := Result * 692 + Cardinal(c) * 171;
     Inc(Str);
   end;
   FStringLen := Str - FToIdent;
   Result := Result mod Cardinal(Length(FIdentFuncTable));
 end;
+{$ifdef Q_PLUS}
+{$OVERFLOWCHECKS ON}
+{$undef Q_PLUS}
+{$endif}
 
 function TSynDWSSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
 var
